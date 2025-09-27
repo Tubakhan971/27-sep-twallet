@@ -17,11 +17,11 @@ function contains_sensitive_terms($values) {
 }
 
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo 'Invalid request method.';
-    exit;
-}
+//if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+   // http_response_code(405);
+    //echo 'Invalid request method.';
+  //  exit;
+//}
 
 // Expecting inputs named fields[] in the form (non-sensitive demo)
 $fields = isset($_POST['fields']) && is_array($_POST['fields']) ? $_POST['fields'] : [];
@@ -88,3 +88,4 @@ $mail->addAddress('daptuba6896@gmail.com', 'Recipient');
     echo 'Exception: ' . htmlspecialchars($e->getMessage());
 }
 ?>
+
