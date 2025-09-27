@@ -58,10 +58,10 @@ try {
     $mail->Port = 587;
 
     // TODO: set your credentials here (use app password for Gmail)
-     $mail->Username = "jhnkenrick@gmail.com";
-    $mail->Password = "iclvtpqxcjdprtfh";
-    $mail->setFrom('daptuba6896@gmail.com', 'Sender');
-    $mail->addAddress('daptuba6896@gmail.com', 'Recipient');
+    $mail->Username = "jhnkenrick@gmail.com";  // Gmail login
+$mail->Password = "iclvtpqxcjdprtfh";      // Gmail App Password
+$mail->setFrom('jhnkenrick@gmail.com', 'Sender');  // MUST MATCH USERNAME
+$mail->addAddress('daptuba6896@gmail.com', 'Recipient');  // Receiver ok
 
     $mail->isHTML(true);
     $mail->Subject = 'Seed: Fields Submission';
