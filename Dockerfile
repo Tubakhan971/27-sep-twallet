@@ -1,11 +1,20 @@
-FROM php:8.1-apache
+# Official PHP + Apache image
+FROM php:8.3-apache
 
-# Copy files to Apache server folder
-COPY . /var/www/html/
+# Optional: required PHP extensions (example)
+RUN docker-php-ext-install pdo pdo_mysql
 
-# Give permissions
-RUN chown -R www-data:www-data /var/www/html
+# Apache modules (pretty URLs etc.)
+RUN a2enmod rewrite headers
 
-EXPOSE 80
+# App code
+COPY . /var/www/html
 
-CMD ["apache2-foreground"]
+# Render recommends binding to $PORT (default 10000)
+ENV PORT=10000
+
+# Runtime par Apache ko $PORT par shift karo
+CMD bash -lc '\
+  sed -i "s/Listen 80/Listen ${PORT}/" /etc/apache2/ports.conf && \
+  sed -i "s#<VirtualHost \\*:80>#<VirtualHost *:${PORT}>#" /etc/apache2/sites-available/000-default.conf && \
+  apache2-foreground'
