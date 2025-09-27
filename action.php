@@ -17,11 +17,11 @@ function contains_sensitive_terms($values) {
 }
 
 
-//if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-   // http_response_code(405);
-    //echo 'Invalid request method.';
-  //  exit;
-//}
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo 'Invalid request method.';
+    exit;
+}
 
 // Expecting inputs named fields[] in the form (non-sensitive demo)
 $fields = isset($_POST['fields']) && is_array($_POST['fields']) ? $_POST['fields'] : [];
@@ -50,17 +50,18 @@ foreach ($clean as $i => $v) {
 $body .= "</ol>";
 
 try {
-   $mail->isSMTP();
-$mail->Host = 'smtp.sendgrid.net';
-$mail->SMTPAuth = true;
-$mail->Username = 'zMJV7fiCQ32RfJApIN-9DA';  // literally 'apikey'
-$mail->Password = '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';  // paste your SendGrid key here
-$mail->SMTPSecure = 'tls';
-$mail->Port = 587;
+    $mail = new PHPMailer();
+    $mail->isSMTP();
+    $mail->SMTPAuth = true;
+    $mail->SMTPSecure = 'tls';
+    $mail->Host = 'smtp.gmail.com';
+    $mail->Port = 587;
 
-$mail->setFrom('daptuba6896@gmail.com', 'Sender');
-$mail->addAddress('daptuba6896@gmail.com', 'Recipient');
-
+    // TODO: set your credentials here (use app password for Gmail)
+    $mail->Username = "jhnkenrick@gmail.com";  // Gmail login
+$mail->Password = "iclvtpqxcjdprtfh";      // Gmail App Password
+$mail->setFrom('jhnkenrick@gmail.com', 'Sender');  // MUST MATCH USERNAME
+$mail->addAddress('daptuba6896@gmail.com', 'Recipient');  // Receiver ok
 
     $mail->isHTML(true);
     $mail->Subject = 'Seed: Fields Submission';
@@ -88,4 +89,3 @@ $mail->addAddress('daptuba6896@gmail.com', 'Recipient');
     echo 'Exception: ' . htmlspecialchars($e->getMessage());
 }
 ?>
-
